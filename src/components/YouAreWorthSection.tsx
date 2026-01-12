@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
 
 export default function YouAreWorthSection() {
   return (
@@ -9,12 +8,12 @@ export default function YouAreWorthSection() {
       {/* Background image */}
       <div className="absolute inset-0 z-0">
         <img
-          src="https://images.pexels.com/photos/1205651/pexels-photo-1205651.jpeg?auto=compress&cs=tinysrgb&w=1920"
+          src="/center.png"
           alt="Graduate with confetti"
           className="w-full h-full object-cover"
         />
         {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/60"></div>
+        <div className="absolute inset-0 bg-black/50"></div>
         
         {/* Golden bokeh effect */}
         <div className="absolute inset-0 opacity-30 pointer-events-none"

@@ -1,20 +1,58 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function HeroSection() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [ripplePhase, setRipplePhase] = useState(0);
+
+  // Slow ripple animation effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRipplePhase((prev) => (prev + 1) % 360);
+    }, 50);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section className="relative h-screen min-h-[700px] flex items-center justify-start overflow-hidden">
-      {/* Background image */}
+      {/* Background image with ripple effect */}
       <div className="absolute inset-0 z-0">
-        <img
-          src="/header.png"
-          alt="Graduate celebrating with confetti"
-          className="w-full h-full object-cover object-center"
+        <motion.div
+          className="absolute inset-0"
+          animate={{
+            scale: [1, 1.02, 1],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        >
+          <img
+            src="/header.png"
+            alt="Graduate celebrating with confetti"
+            className="w-full h-full object-cover object-center"
+            style={{
+              transform: `scale(1.05)`,
+            }}
+          />
+        </motion.div>
+        
+        {/* Animated ripple overlay */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-30"
+          style={{
+            background: `
+              radial-gradient(ellipse at ${50 + Math.sin(ripplePhase * 0.02) * 10}% ${50 + Math.cos(ripplePhase * 0.015) * 8}%, 
+                rgba(197, 160, 101, 0.15) 0%, transparent 50%),
+              radial-gradient(ellipse at ${30 + Math.cos(ripplePhase * 0.018) * 15}% ${70 + Math.sin(ripplePhase * 0.012) * 10}%, 
+                rgba(255, 215, 0, 0.1) 0%, transparent 40%)
+            `,
+          }}
         />
+        
         {/* Gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
@@ -43,9 +81,15 @@ export default function HeroSection() {
             <span className="block font-bold italic text-white">YOU&apos;VE MET</span>
             <span className="block font-bold italic text-white">THE MOMENT.</span>
             
-            {/* Bottom lines - light with gradient effect */}
+            {/* Bottom lines - light with gradient effect matching image */}
             <motion.span 
-              className="block font-light mt-2 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-400 bg-clip-text text-transparent"
+              className="block font-light italic mt-2"
+              style={{
+                background: "linear-gradient(to right, rgba(180, 170, 160, 1), rgba(120, 115, 110, 0.8))",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
@@ -53,7 +97,13 @@ export default function HeroSection() {
               NOW, IT&apos;S TIME
             </motion.span>
             <motion.span 
-              className="block font-light bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 bg-clip-text text-transparent"
+              className="block font-light italic"
+              style={{
+                background: "linear-gradient(to right, rgba(160, 150, 140, 0.9), rgba(100, 95, 90, 0.7))",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}

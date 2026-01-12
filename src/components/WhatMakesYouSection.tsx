@@ -1,28 +1,58 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useCallback } from "react";
 
 const slides = [
   {
     id: 1,
-    image: "https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=800",
-    alt: "Graduate in cap and gown"
+    image: "https://images.pexels.com/photos/1205651/pexels-photo-1205651.jpeg?auto=compress&cs=tinysrgb&w=800",
+    alt: "Graduation celebration"
   },
   {
     id: 2,
-    image: "https://images.pexels.com/photos/1205651/pexels-photo-1205651.jpeg?auto=compress&cs=tinysrgb&w=800",
-    alt: "Graduation celebration"
+    image: "https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=800",
+    alt: "Graduate in cap and gown"
   },
   {
     id: 3,
     image: "https://images.pexels.com/photos/1454360/pexels-photo-1454360.jpeg?auto=compress&cs=tinysrgb&w=800",
     alt: "Student celebrating"
   },
+  {
+    id: 4,
+    image: "https://images.pexels.com/photos/7944228/pexels-photo-7944228.jpeg?auto=compress&cs=tinysrgb&w=800",
+    alt: "Happy graduate"
+  },
+  {
+    id: 5,
+    image: "https://images.pexels.com/photos/5905700/pexels-photo-5905700.jpeg?auto=compress&cs=tinysrgb&w=800",
+    alt: "Graduation day"
+  },
 ];
 
 export default function WhatMakesYouSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  }, []);
+
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  }, []);
+
+  // Auto-slide with timer
+  useEffect(() => {
+    if (isPaused) return;
+    
+    const timer = setInterval(() => {
+      nextSlide();
+    }, 4000); // Change slide every 4 seconds
+
+    return () => clearInterval(timer);
+  }, [isPaused, nextSlide]);
 
   return (
     <section className="bg-black py-16 md:py-24 relative overflow-hidden">
@@ -75,28 +105,49 @@ export default function WhatMakesYouSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
           >
             <div className="relative aspect-[4/5] rounded-lg overflow-hidden">
               {/* Golden glow effect */}
               <div className="absolute -inset-2 bg-gradient-to-r from-[#C5A065]/20 to-[#D4AF37]/20 rounded-lg blur-xl opacity-50"></div>
               
               <div className="relative w-full h-full">
-                {slides.map((slide, index) => (
+                <AnimatePresence mode="wait">
                   <motion.img
-                    key={slide.id}
-                    src={slide.image}
-                    alt={slide.alt}
-                    className={`absolute inset-0 w-full h-full object-cover rounded-lg transition-opacity duration-500 ${
-                      index === currentSlide ? "opacity-100" : "opacity-0"
-                    }`}
-                    initial={{ scale: 1.1 }}
-                    animate={{ scale: index === currentSlide ? 1 : 1.1 }}
+                    key={slides[currentSlide].id}
+                    src={slides[currentSlide].image}
+                    alt={slides[currentSlide].alt}
+                    className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                    initial={{ opacity: 0, scale: 1.1 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.7 }}
                   />
-                ))}
+                </AnimatePresence>
                 
                 {/* Image overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent rounded-lg"></div>
+
+                {/* Navigation arrows */}
+                <button
+                  onClick={prevSlide}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                  aria-label="Previous slide"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={nextSlide}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                  aria-label="Next slide"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
               </div>
 
               {/* Carousel indicators */}
