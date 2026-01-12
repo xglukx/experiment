@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
@@ -29,11 +29,30 @@ const categoryLinks = [
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Track scroll position
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setIsScrolled(scrollY > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <>
       {/* Main navigation */}
-      <nav className="sticky top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/10">
+      <motion.nav 
+        className="fixed top-0 w-full z-50 backdrop-blur-md border-b border-white/10"
+        initial={false}
+        animate={{
+          backgroundColor: isScrolled ? "rgba(0, 0, 0, 0.95)" : "rgba(0, 0, 0, 0.5)",
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             {/* Logo */}
@@ -107,28 +126,38 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Secondary Category Menu - Desktop */}
-        <div className="hidden lg:block bg-black/70 border-t border-white/5">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-center space-x-6 h-10">
-              {categoryLinks.map((link, index) => (
-                <motion.div
-                  key={link.name}
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.03 }}
-                >
-                  <Link
-                    href={link.href}
-                    className="text-gray-400 hover:text-[#C5A065] text-xs font-medium transition-colors duration-200 whitespace-nowrap"
-                  >
-                    {link.name}
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
+        {/* Secondary Category Menu - Desktop - Animated on scroll */}
+        <AnimatePresence>
+          {!isScrolled && (
+            <motion.div 
+              className="hidden lg:block bg-black/40 border-t border-white/5"
+              initial={{ height: 40, opacity: 1 }}
+              animate={{ height: 40, opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-center space-x-6 h-10">
+                  {categoryLinks.map((link, index) => (
+                    <motion.div
+                      key={link.name}
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.03 }}
+                    >
+                      <Link
+                        href={link.href}
+                        className="text-gray-400 hover:text-[#C5A065] text-xs font-medium transition-colors duration-200 whitespace-nowrap"
+                      >
+                        {link.name}
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Mobile menu */}
         <AnimatePresence>
@@ -185,7 +214,7 @@ export default function Navbar() {
             </motion.div>
           )}
         </AnimatePresence>
-      </nav>
+      </motion.nav>
     </>
   );
 }
